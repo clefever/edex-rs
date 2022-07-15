@@ -36,9 +36,7 @@ fn app(cx: Scope) -> Element {
         style { [include_str!("./assets/css/main.css")]}
         body { class: "solidBackground",
             section { id: "boot_screen" }
-            section { id: "keyboard",
-                components::keyboard::keyboard(layout: kb_layout)
-        }
+            components::keyboard::keyboard(layout: kb_layout)
     }))
 }
 
