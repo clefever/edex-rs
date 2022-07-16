@@ -3,6 +3,7 @@ use models::kb_layout::KbLayout;
 use models::theme::Theme;
 
 mod components {
+    pub mod boot_screen;
     pub mod keyboard;
 }
 
@@ -35,9 +36,10 @@ fn app(cx: Scope) -> Element {
         }
         style { [include_str!("./assets/css/main.css")]}
         body { class: "solidBackground",
-            section { id: "boot_screen" }
+            components::boot_screen::boot_screen()
             components::keyboard::keyboard(layout: kb_layout)
-    }))
+        }
+    ))
 }
 
 fn load_theme() -> Theme {
