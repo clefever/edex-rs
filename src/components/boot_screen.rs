@@ -48,7 +48,7 @@ pub fn boot_screen(cx: Scope) -> Element {
             )},
             State::TitleTransition => rsx!(""),
             State::TitleScreen => {
-                rsx!(h1 { "eDEX-rs "})
+                rsx!(h1 { "eDEX-rs" })
             }
         }
 
@@ -98,9 +98,11 @@ async fn print_line(
 }
 
 async fn display_title(class: UseState<&str>) {
-    class.set("center");
-    // TODO: Some stuff that requires theme vars
-    tokio::time::sleep(Duration::from_millis(700)).await;
+    if class != "center" {
+        class.set("center");
+        // TODO: Some stuff that requires theme vars
+        tokio::time::sleep(Duration::from_millis(700)).await;
+    }
 }
 
 fn load_boot_log() -> Vec<String> {

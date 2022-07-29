@@ -34,7 +34,7 @@ fn app(cx: Scope) -> Element {
                 dangerous_inner_html: "{theme}" // TODO: Better way to do this?
             }
         }
-        style { [include_str!("./assets/css/main.css")]}
+        style { [include_str!("./assets/css/main.css")] }
         body { class: "solidBackground",
             components::boot_screen::boot_screen()
             components::keyboard::keyboard(layout: kb_layout)
