@@ -80,9 +80,9 @@ fn theme_str(theme: Theme) -> String {
    	   cursor: none !important;
 	}}
     ",
-        theme.cssvars.font_main,
-        theme.cssvars.font_main_light,
-        theme.terminal.fontFamily,
+        theme.css_vars.font_main,
+        theme.css_vars.font_main_light,
+        theme.terminal.font_family,
         theme.colors.r,
         theme.colors.g,
         theme.colors.b,

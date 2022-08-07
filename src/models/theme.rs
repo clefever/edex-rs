@@ -3,7 +3,8 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 pub struct Theme {
     pub colors: Colors,
-    pub cssvars: CssVars,
+    #[serde(rename = "cssvars")]
+    pub css_vars: CssVars,
     pub terminal: Terminal,
     pub globe: Globe,
 }
@@ -28,12 +29,15 @@ pub struct CssVars {
 
 #[derive(Deserialize)]
 pub struct Terminal {
-    pub fontFamily: String,
-    pub cursorStyle: String,
+    #[serde(rename = "fontFamily")]
+    pub font_family: String,
+    #[serde(rename = "cursorStyle")]
+    pub cursor_style: String,
     pub foreground: String,
     pub background: String,
     pub cursor: String,
-    pub cursorAccent: String,
+    #[serde(rename = "cursorAccent")]
+    pub cursor_accent: String,
     pub selection: String,
 }
 
