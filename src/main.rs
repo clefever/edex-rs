@@ -30,6 +30,7 @@ fn app(cx: Scope) -> Element {
 
     cx.render(rsx!(
         head {
+            style { [include_str!("./assets/css/fonts.css")] }
             style { class: "theming",
                 dangerous_inner_html: "{theme}" // TODO: Better way to do this?
             }

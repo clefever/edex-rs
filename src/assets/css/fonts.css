@@ -1,0 +1,19 @@
+@font-face {
+    font-family: 'Fira Code';
+    src: url('./src/assets/fonts/fira_code.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Fira Mono';
+    src: url('./src/assets/fonts/fira_mono.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'United Sans Light';
+    src: url('./src/assets/fonts/united_sans_light.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'United Sans Medium';
+    src: url('./src/assets/fonts/united_sans_medium.woff2') format('woff2');
+}
