@@ -4,6 +4,7 @@ use models::theme::Theme;
 
 mod components {
     pub mod boot_screen;
+    pub mod clock;
     pub mod keyboard;
 }
 
@@ -24,6 +25,7 @@ fn main() {
 }
 
 fn app(cx: Scope) -> Element {
+    let init_ui = use_state(&cx, || true);
     let kb_layout = use_state(&cx, || load_kb_layout());
     let theme = load_theme();
     let theme = theme_str(theme);
@@ -36,10 +38,30 @@ fn app(cx: Scope) -> Element {
             }
         }
         style { [include_str!("./assets/css/main.css")] }
-        body { class: "solidBackground",
-            components::boot_screen::boot_screen()
-            components::keyboard::keyboard(layout: kb_layout)
-        }
+        style { [include_str!("./assets/css/mod_column.css")] }
+        style { [include_str!("./assets/css/extra_ratios.css")] }
+        if !init_ui {rsx!(
+            body { class: "solidBackground",
+                components::boot_screen::boot_screen()
+            }
+        )} else {rsx!(
+            body { class: "solidBackground",
+                section { class: "mod_colum activated", id: "mod_column_left",
+                    h3 { class: "title",
+                        p { "PANEL" }
+                        p { "SYSTEM" }
+                    }
+                    components::clock::clock()
+                }
+                section { class: "mod_column activated", id: "mod_column_right",
+                    h3 { class: "title",
+                        p { "PANEL" }
+                        p { "NETWORK" }
+                    }
+                }
+                components::keyboard::keyboard(layout: kb_layout)
+            }
+        )}
     ))
 }
 
