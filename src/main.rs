@@ -5,7 +5,9 @@ use models::theme::Theme;
 mod components {
     pub mod boot_screen;
     pub mod clock;
+    pub mod hardware_inspector;
     pub mod keyboard;
+    pub mod sys_info;
 }
 
 mod models {
@@ -38,6 +40,7 @@ fn app(cx: Scope) -> Element {
             }
         }
         style { [include_str!("./assets/css/main.css")] }
+        style { [include_str!("./assets/css/main_shell.css")] }
         style { [include_str!("./assets/css/mod_column.css")] }
         style { [include_str!("./assets/css/extra_ratios.css")] }
         if !init_ui {rsx!(
@@ -52,6 +55,15 @@ fn app(cx: Scope) -> Element {
                         p { "SYSTEM" }
                     }
                     components::clock::clock()
+                    components::sys_info::sys_info()
+                    components::hardware_inspector::hardware_inspector()
+                }
+                section { id: "main_shell", style: "margin-bottom:30vh;", "augmented-ui": "bl-clip tr-clip exe",
+                    h3 { class: "title", style: "",
+                        p { "TERMINAL" }
+                        p { "MAIN SHELL" }
+                    }
+                    h1 { id: "main_shell_greeting" }
                 }
                 section { class: "mod_column activated", id: "mod_column_right",
                     h3 { class: "title",
