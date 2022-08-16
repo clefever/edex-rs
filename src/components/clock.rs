@@ -19,6 +19,7 @@ pub fn clock(cx: Scope) -> Element {
     cx.render(rsx!(
         style{ [include_str!("../assets/css/mod_clock.css")] }
         div { id: "mod_clock", class: "", // TODO: Make configurable
+            style: "animation-play-state: running;", // TODO: Set by timed startup
             h1 { id:"mod_clock_text",
                 time_digits(time: time.to_string())
             }

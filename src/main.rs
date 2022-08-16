@@ -46,7 +46,7 @@ fn app(cx: Scope) -> Element {
             }
         )} else {rsx!(
             body { class: "solidBackground",
-                section { class: "mod_colum activated", id: "mod_column_left",
+                section { class: "mod_column activated", id: "mod_column_left",
                     h3 { class: "title",
                         p { "PANEL" }
                         p { "SYSTEM" }
