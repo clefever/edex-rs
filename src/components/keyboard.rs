@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use models::kb_layout::{KbLayout, Key};
+use models::{KbLayout, Key};
 
 use crate::models;
 

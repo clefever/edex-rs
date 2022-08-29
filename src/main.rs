@@ -1,19 +1,7 @@
 use dioxus::prelude::*;
-use models::kb_layout::KbLayout;
-use models::theme::Theme;
 
-mod components {
-    pub mod boot_screen;
-    pub mod clock;
-    pub mod hardware_inspector;
-    pub mod keyboard;
-    pub mod sys_info;
-}
-
-mod models {
-    pub mod kb_layout;
-    pub mod theme;
-}
+mod components;
+mod models;
 
 fn main() {
     use dioxus::desktop::tao::dpi::LogicalSize;
@@ -45,7 +33,7 @@ fn app(cx: Scope) -> Element {
         style { [include_str!("./assets/css/extra_ratios.css")] }
         if !init_ui {rsx!(
             body { class: "solidBackground",
-                components::boot_screen::boot_screen()
+                components::boot_screen()
             }
         )} else {rsx!(
             body { class: "solidBackground",
@@ -54,9 +42,9 @@ fn app(cx: Scope) -> Element {
                         p { "PANEL" }
                         p { "SYSTEM" }
                     }
-                    components::clock::clock()
-                    components::sys_info::sys_info()
-                    components::hardware_inspector::hardware_inspector()
+                    components::clock()
+                    components::sys_info()
+                    components::hardware_inspector()
                 }
                 section { id: "main_shell", style: "margin-bottom:30vh;", "augmented-ui": "bl-clip tr-clip exe",
                     h3 { class: "title", style: "",
@@ -71,25 +59,25 @@ fn app(cx: Scope) -> Element {
                         p { "NETWORK" }
                     }
                 }
-                components::keyboard::keyboard(layout: kb_layout)
+                components::keyboard(layout: kb_layout)
             }
         )}
     ))
 }
 
-fn load_theme() -> Theme {
+fn load_theme() -> models::Theme {
     let theme = include_str!("./assets/themes/tron.json");
-    let result: Theme = serde_json::from_str(theme).unwrap();
+    let result: models::Theme = serde_json::from_str(theme).unwrap();
     result
 }
 
-fn load_kb_layout() -> KbLayout {
+fn load_kb_layout() -> models::KbLayout {
     let layout = include_str!("./assets/kb_layouts/en-US.json");
-    let result: KbLayout = serde_json::from_str(layout).unwrap();
+    let result: models::KbLayout = serde_json::from_str(layout).unwrap();
     result
 }
 
-fn theme_str(theme: Theme) -> String {
+fn theme_str(theme: models::Theme) -> String {
     format!(
         "
     :root {{
