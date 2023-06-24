@@ -1,4 +1,4 @@
-use dioxus::{core::to_owned, prelude::*};
+use dioxus::prelude::*;
 use std::fs;
 use tokio::time::Duration;
 
@@ -35,7 +35,7 @@ pub fn boot_screen(cx: Scope) -> Element {
     });
 
     cx.render(rsx!(
-        style { [include_str!("../assets/css/boot_screen.css")] }
+        style { include_str!("../assets/css/boot_screen.css") }
         section { class: "{class}", id: "boot_screen",
         match state.get() {
             State::Boot => {rsx!(

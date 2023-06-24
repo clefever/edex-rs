@@ -9,7 +9,7 @@ pub fn sys_info(cx: Scope) -> Element {
     // TODO: Month should be capital
 
     cx.render(rsx!(
-        style{ [include_str!("../assets/css/mod_sysinfo.css")] }
+        style{ include_str!("../assets/css/mod_sysinfo.css") }
         div { id: "mod_sysinfo", style: "animation-play-state: running;", // TODO: Set by timed startup
             div {
                 h1 { "{year}" }

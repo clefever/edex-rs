@@ -16,13 +16,13 @@ pub fn keyboard<'a>(cx: Scope<'a, KeyboardProps<'a>>) -> Element<'a> {
     let row_space = cx.props.layout.current().row_space.to_vec();
 
     cx.render(rsx!(
-        style { [include_str!("../assets/css/keyboard.css")]}
+        style { include_str!("../assets/css/keyboard.css") }
         section { id: "keyboard",
-            keyboard_row( id: String::from("row_numbers"), keys: row_numbers )
-            keyboard_row( id: String::from("row_1"), keys: row_1 )
-            keyboard_row( id: String::from("row_2"), keys: row_2 )
-            keyboard_row( id: String::from("row_3"), keys: row_3 )
-            keyboard_row( id: String::from("row_space"), keys: row_space )
+            keyboard_row { id: String::from("row_numbers"), keys: row_numbers }
+            keyboard_row { id: String::from("row_1"), keys: row_1 }
+            keyboard_row { id: String::from("row_2"), keys: row_2 }
+            keyboard_row { id: String::from("row_3"), keys: row_3 }
+            keyboard_row { id: String::from("row_space"), keys: row_space }
         }
     ))
 }
@@ -40,7 +40,14 @@ fn keyboard_row(cx: Scope<KeyboardRowProps>) -> Element {
         div {
             class: "keyboard_row", id: "{cx.props.id}",
             keys.into_iter().map(|key| {
-                rsx!(keyboard_key( name: key.name, cmd: key.cmd, altshift_name: key.altshift_name.unwrap_or(String::new()), fn_name: key.fn_name.unwrap_or(String::new()), alt_name: key.alt_name.unwrap_or(String::new()), shift_name: key.shift_name.unwrap_or(String::new()) ))
+                rsx!(keyboard_key {
+                    name: key.name,
+                    cmd: key.cmd,
+                    altshift_name: key.altshift_name.unwrap_or(String::new()),
+                    fn_name: key.fn_name.unwrap_or(String::new()),
+                    alt_name: key.alt_name.unwrap_or(String::new()),
+                    shift_name: key.shift_name.unwrap_or(String::new())
+                })
             })
         }
     ))
@@ -61,11 +68,11 @@ fn keyboard_key(cx: Scope<KeyProps>) -> Element {
         rsx!(div {
             class: "keyboard_key",
             match &cx.props.name[17..] {
-                "ARROW_UP" => rsx!(arrow_up()),
-                "ARROW_LEFT" => rsx!(arrow_left()),
-                "ARROW_DOWN" => rsx!(arrow_down()),
-                "ARROW_RIGHT" => rsx!(arrow_right()),
-                _ => rsx!(missing_icon()),
+                "ARROW_UP" => rsx!(arrow_up {}),
+                "ARROW_LEFT" => rsx!(arrow_left {}),
+                "ARROW_DOWN" => rsx!(arrow_down {}),
+                "ARROW_RIGHT" => rsx!(arrow_right {}),
+                _ => rsx!(missing_icon {}),
             }
         })
     } else {

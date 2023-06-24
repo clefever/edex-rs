@@ -1,17 +1,19 @@
 use dioxus::prelude::*;
+use dioxus_desktop::{Config, WindowBuilder};
 
 mod components;
 mod models;
 
 fn main() {
-    use dioxus::desktop::tao::dpi::LogicalSize;
-    dioxus::desktop::launch_cfg(app, |cfg| {
-        cfg.with_window(|w| {
-            w.with_title("eDEX-rs")
+    dioxus_desktop::launch_cfg(
+        app,
+        Config::default().with_window(
+            WindowBuilder::new()
+                .with_title("eDEX-rs")
                 .with_resizable(false)
-                .with_inner_size(LogicalSize::new(1280.0, 720.0))
-        })
-    });
+                .with_inner_size(dioxus_desktop::tao::dpi::LogicalSize::new(1280.0, 720.0)),
+        ),
+    );
 }
 
 fn app(cx: Scope) -> Element {
@@ -22,18 +24,18 @@ fn app(cx: Scope) -> Element {
 
     cx.render(rsx!(
         head {
-            style { [include_str!("./assets/css/fonts.css")] }
+            style { include_str!("./assets/css/fonts.css") }
             style { class: "theming",
                 dangerous_inner_html: "{theme}" // TODO: Better way to do this?
             }
         }
-        style { [include_str!("./assets/css/main.css")] }
-        style { [include_str!("./assets/css/main_shell.css")] }
-        style { [include_str!("./assets/css/mod_column.css")] }
-        style { [include_str!("./assets/css/extra_ratios.css")] }
+        style { include_str!("./assets/css/main.css") }
+        style { include_str!("./assets/css/main_shell.css") }
+        style { include_str!("./assets/css/mod_column.css") }
+        style { include_str!("./assets/css/extra_ratios.css") }
         if !init_ui {rsx!(
             body { class: "solidBackground",
-                components::boot_screen()
+                components::boot_screen {}
             }
         )} else {rsx!(
             body { class: "solidBackground",
@@ -42,9 +44,9 @@ fn app(cx: Scope) -> Element {
                         p { "PANEL" }
                         p { "SYSTEM" }
                     }
-                    components::clock()
-                    components::sys_info()
-                    components::hardware_inspector()
+                    components::clock {}
+                    components::sys_info {}
+                    components::hardware_inspector {}
                 }
                 section { id: "main_shell", style: "margin-bottom:30vh;", "augmented-ui": "bl-clip tr-clip exe",
                     h3 { class: "title", style: "",
@@ -59,7 +61,7 @@ fn app(cx: Scope) -> Element {
                         p { "NETWORK" }
                     }
                 }
-                components::keyboard(layout: kb_layout)
+                components::keyboard { layout: kb_layout }
             }
         )}
     ))
