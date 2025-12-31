@@ -1,15 +1,18 @@
 use chrono::Local;
 use dioxus::prelude::*;
 
-pub fn sys_info(cx: Scope) -> Element {
+const SYS_INFO_CSS: &str = include_str!("../../assets/css/mod_sysinfo.css");
+
+#[component]
+pub fn SysInfo() -> Element {
     let time = Local::now();
 
-    let year = use_state(&cx, || time.format("%Y"));
-    let day = use_state(&cx, || time.format("%b %e"));
+    let year = use_signal(|| time.format("%Y"));
+    let day = use_signal(|| time.format("%b %e"));
     // TODO: Month should be capital
 
-    cx.render(rsx!(
-        style{ include_str!("../assets/css/mod_sysinfo.css") }
+    rsx! {
+        style{ "{SYS_INFO_CSS}" }
         div { id: "mod_sysinfo", style: "animation-play-state: running;", // TODO: Set by timed startup
             div {
                 h1 { "{year}" }
@@ -28,5 +31,5 @@ pub fn sys_info(cx: Scope) -> Element {
                 h2 { "00%" }
             }
         }
-    ))
+    }
 }

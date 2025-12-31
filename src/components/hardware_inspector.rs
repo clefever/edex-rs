@@ -1,8 +1,11 @@
 use dioxus::prelude::*;
 
-pub fn hardware_inspector(cx: Scope) -> Element {
-    cx.render(rsx!(
-        style { include_str!("../assets/css/mod_hardwareInspector.css") }
+const HARDWARE_INSPECTOR_CSS: &str = include_str!("../../assets/css/mod_hardwareInspector.css");
+
+#[component]
+pub fn HardwareInspector() -> Element {
+    rsx! {
+        style { "{HARDWARE_INSPECTOR_CSS}" }
         div { id: "mod_hardwareInspector", style: "animation-play-state: running;", // TODO: Set by timed startup
             div { id: "mod_hardwareInspector_inner",
                 div {
@@ -25,5 +28,5 @@ pub fn hardware_inspector(cx: Scope) -> Element {
                 }
             }
         }
-    ))
+    }
 }

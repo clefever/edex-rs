@@ -1,52 +1,58 @@
-use dioxus::prelude::*;
-use dioxus_desktop::{Config, WindowBuilder};
+use dioxus::{desktop::{Config, LogicalSize, WindowBuilder, wry::dpi::Size}, prelude::*};
 
 mod components;
 mod models;
 
+const FONTS_CSS: Asset = asset!("/assets/css/fonts.css");
+const MAIN_CSS: Asset = asset!("/assets/css/main.css");
+const MAIN_SHELL_CSS: Asset = asset!("/assets/css/main_shell.css");
+const MOD_COLUMN_CSS: Asset = asset!("/assets/css/mod_column.css");
+const EXTRA_RATIOS_CSS: Asset = asset!("/assets/css/extra_ratios.css");
+
 fn main() {
-    dioxus_desktop::launch_cfg(
-        app,
-        Config::default().with_window(
+    dioxus::LaunchBuilder::new()
+    .with_cfg(
+        Config::default().with_menu(None).with_window(
             WindowBuilder::new()
                 .with_title("eDEX-rs")
                 .with_resizable(false)
-                .with_inner_size(dioxus_desktop::tao::dpi::LogicalSize::new(1280.0, 720.0)),
-        ),
-    );
+                .with_inner_size(Size::Logical(LogicalSize::new(1280.0, 720.0)))
+            )
+        )
+    .launch(App);
 }
 
-fn app(cx: Scope) -> Element {
-    let init_ui = use_state(&cx, || true);
-    let kb_layout = use_state(&cx, || load_kb_layout());
+#[component]
+fn App() -> Element {
+    let init_ui = use_signal(|| true);
+    let kb_layout = use_signal(|| load_kb_layout());
     let theme = load_theme();
     let theme = theme_str(theme);
-
-    cx.render(rsx!(
-        head {
-            style { include_str!("./assets/css/fonts.css") }
-            style { class: "theming",
-                dangerous_inner_html: "{theme}" // TODO: Better way to do this?
-            }
+    
+    rsx! {
+        style { class: "theming",
+            dangerous_inner_html: "{theme}" // TODO: Better way to do this?
         }
-        style { include_str!("./assets/css/main.css") }
-        style { include_str!("./assets/css/main_shell.css") }
-        style { include_str!("./assets/css/mod_column.css") }
-        style { include_str!("./assets/css/extra_ratios.css") }
-        if !init_ui {rsx!(
-            body { class: "solidBackground",
-                components::boot_screen {}
+        document::Stylesheet { href: FONTS_CSS }
+        document::Stylesheet { href: MAIN_CSS }
+        document::Stylesheet { href: MAIN_SHELL_CSS }
+        document::Stylesheet { href: MOD_COLUMN_CSS }
+        document::Stylesheet { href: EXTRA_RATIOS_CSS }
+        if !init_ui() {
+            body {
+                class: "solidBackground",
+                components::BootScreen {}
             }
-        )} else {rsx!(
+        } else {
             body { class: "solidBackground",
                 section { class: "mod_column activated", id: "mod_column_left",
                     h3 { class: "title",
                         p { "PANEL" }
                         p { "SYSTEM" }
                     }
-                    components::clock {}
-                    components::sys_info {}
-                    components::hardware_inspector {}
+                    components::Clock {}
+                    components::SysInfo {}
+                    components::HardwareInspector {}
                 }
                 section { id: "main_shell", style: "margin-bottom:30vh;", "augmented-ui": "bl-clip tr-clip exe",
                     h3 { class: "title", style: "",
@@ -61,20 +67,20 @@ fn app(cx: Scope) -> Element {
                         p { "NETWORK" }
                     }
                 }
-                components::keyboard { layout: kb_layout }
+                components::Keyboard { layout: kb_layout }
             }
-        )}
-    ))
+        }
+    }
 }
 
 fn load_theme() -> models::Theme {
-    let theme = include_str!("./assets/themes/tron.json");
+    let theme = include_str!("../assets/themes/tron.json");
     let result: models::Theme = serde_json::from_str(theme).unwrap();
     result
 }
 
 fn load_kb_layout() -> models::KbLayout {
-    let layout = include_str!("./assets/kb_layouts/en-US.json");
+    let layout = include_str!("../assets/kb_layouts/en-US.json");
     let result: models::KbLayout = serde_json::from_str(layout).unwrap();
     result
 }

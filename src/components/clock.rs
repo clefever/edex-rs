@@ -2,41 +2,41 @@ use chrono::Local;
 use dioxus::prelude::*;
 use tokio::time::Duration;
 
-pub fn clock(cx: Scope) -> Element {
+const CLOCK_CSS: &str = include_str!("../../assets/css/mod_clock.css");
+
+#[component]
+pub fn Clock() -> Element {
     let now = Local::now();
 
-    let time = use_state(&cx, || now.format("%T"));
+    let mut time = use_signal(|| now.format("%T").to_string());
 
-    cx.spawn({
-        to_owned![time];
-        async move {
+    spawn(async move {
+        loop {
             tokio::time::sleep(Duration::from_millis(1000)).await;
             let now = Local::now();
-            time.set(now.format("%T"));
+            *time.write() = now.format("%T").to_string();
         }
     });
 
-    cx.render(rsx!(
-        style{ include_str!("../assets/css/mod_clock.css") }
+    rsx! {
+        style{ "{CLOCK_CSS}" }
         div { id: "mod_clock", class: "", // TODO: Make configurable
             style: "animation-play-state: running;", // TODO: Set by timed startup
             h1 { id: "mod_clock_text",
-                time_digits { time: time.to_string() }
+                TimeDigits { time: time() }
             }
         }
-    ))
+    }
 }
 
-#[derive(PartialEq, Props)]
-struct TimeDigitsProps {
-    time: String,
-}
-
-fn time_digits(cx: Scope<TimeDigitsProps>) -> Element {
-    cx.render(rsx!(cx.props.time.chars().map(|char| {
-        rsx!(match char {
-            ':' => rsx!(em { "{char}" }),
-            _ => rsx!(span { "{char}" }),
-        })
-    })))
+#[component]
+fn TimeDigits(time: String) -> Element {
+    rsx! {
+        {time.chars().map(|char| {
+            match char {
+                ':' => rsx! { em { "{char}" } },
+                _ => rsx! { span { "{char}" } },
+            }
+        })}
+    }
 }
