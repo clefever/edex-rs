@@ -3,7 +3,7 @@ use models::{KbLayout, Key};
 
 use crate::models;
 
-const KEYBOARD_CSS: &str = include_str!("../../assets/css/keyboard.css");
+const KEYBOARD_CSS: Asset = asset!("/assets/css/keyboard.css");
 
 #[component]
 pub fn Keyboard(layout: ReadSignal<KbLayout>) -> Element {
@@ -14,7 +14,7 @@ pub fn Keyboard(layout: ReadSignal<KbLayout>) -> Element {
     let row_space = layout.read().row_space.clone();
 
     rsx! {
-        style { "{KEYBOARD_CSS}" }
+        document::Stylesheet { href: KEYBOARD_CSS }
         section { id: "keyboard",
             KeyboardRow { id: String::from("row_numbers"), keys: row_numbers }
             KeyboardRow { id: String::from("row_1"), keys: row_1 }

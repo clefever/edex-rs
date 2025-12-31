@@ -3,7 +3,11 @@ use dioxus::{desktop::{Config, LogicalSize, WindowBuilder, wry::dpi::Size}, prel
 mod components;
 mod models;
 
-const FONTS_CSS: Asset = asset!("/assets/css/fonts.css");
+const FONT_FIRA_CODE: Asset = asset!("/assets/fonts/fira_code.woff2");
+const FONT_FIRA_MONO: Asset = asset!("/assets/fonts/fira_mono.woff2");
+const FONT_UNITED_SANS_LIGHT: Asset = asset!("/assets/fonts/united_sans_light.woff2");
+const FONT_UNITED_SANS_MEDIUM: Asset = asset!("/assets/fonts/united_sans_medium.woff2");
+
 const MAIN_CSS: Asset = asset!("/assets/css/main.css");
 const MAIN_SHELL_CSS: Asset = asset!("/assets/css/main_shell.css");
 const MOD_COLUMN_CSS: Asset = asset!("/assets/css/mod_column.css");
@@ -30,10 +34,8 @@ fn App() -> Element {
     let theme = theme_str(theme);
     
     rsx! {
-        style { class: "theming",
-            dangerous_inner_html: "{theme}" // TODO: Better way to do this?
-        }
-        document::Stylesheet { href: FONTS_CSS }
+        document::Style { class: "theming", "{theme}" }
+        document::Style { class: "fonts", "{fonts_css()}" }
         document::Stylesheet { href: MAIN_CSS }
         document::Stylesheet { href: MAIN_SHELL_CSS }
         document::Stylesheet { href: MOD_COLUMN_CSS }
@@ -83,6 +85,36 @@ fn load_kb_layout() -> models::KbLayout {
     let layout = include_str!("../assets/kb_layouts/en-US.json");
     let result: models::KbLayout = serde_json::from_str(layout).unwrap();
     result
+}
+
+fn fonts_css() -> String {
+    format!(
+        "
+    @font-face {{
+        font-family: 'Fira Code';
+        src: url('{}') format('woff2');
+    }}
+
+    @font-face {{
+        font-family: 'Fira Mono';
+        src: url('{}') format('woff2');
+    }}
+
+    @font-face {{
+        font-family: 'United Sans Light';
+        src: url('{}') format('woff2');
+    }}
+
+    @font-face {{
+        font-family: 'United Sans Medium';
+        src: url('{}') format('woff2');
+    }}
+    ",
+        FONT_FIRA_CODE,
+        FONT_FIRA_MONO,
+        FONT_UNITED_SANS_LIGHT,
+        FONT_UNITED_SANS_MEDIUM,
+    )
 }
 
 fn theme_str(theme: models::Theme) -> String {

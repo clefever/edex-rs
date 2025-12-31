@@ -1,11 +1,11 @@
 use dioxus::prelude::*;
 
-const HARDWARE_INSPECTOR_CSS: &str = include_str!("../../assets/css/mod_hardwareInspector.css");
+const HARDWARE_INSPECTOR_CSS: Asset = asset!("/assets/css/mod_hardwareInspector.css");
 
 #[component]
 pub fn HardwareInspector() -> Element {
     rsx! {
-        style { "{HARDWARE_INSPECTOR_CSS}" }
+        document::Stylesheet { href: HARDWARE_INSPECTOR_CSS }
         div { id: "mod_hardwareInspector", style: "animation-play-state: running;", // TODO: Set by timed startup
             div { id: "mod_hardwareInspector_inner",
                 div {

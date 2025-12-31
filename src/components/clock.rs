@@ -2,7 +2,7 @@ use chrono::Local;
 use dioxus::prelude::*;
 use tokio::time::Duration;
 
-const CLOCK_CSS: &str = include_str!("../../assets/css/mod_clock.css");
+const CLOCK_CSS: Asset = asset!("/assets/css/mod_clock.css");
 
 #[component]
 pub fn Clock() -> Element {
@@ -19,7 +19,7 @@ pub fn Clock() -> Element {
     });
 
     rsx! {
-        style{ "{CLOCK_CSS}" }
+        document::Stylesheet { href: CLOCK_CSS }
         div { id: "mod_clock", class: "", // TODO: Make configurable
             style: "animation-play-state: running;", // TODO: Set by timed startup
             h1 { id: "mod_clock_text",

@@ -3,7 +3,7 @@ use std::fs;
 use tokio::time::Duration;
 
 const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
-const BOOT_SCREEN_CSS: &str = include_str!("../../assets/css/boot_screen.css");
+const BOOT_SCREEN_CSS: Asset = asset!("/assets/css/boot_screen.css");
 
 #[derive(Clone, Copy, PartialEq)]
 enum State {
@@ -35,7 +35,7 @@ pub fn BootScreen() -> Element {
     });
 
     rsx! {
-        style { "{BOOT_SCREEN_CSS}" }
+        document::Stylesheet { href: BOOT_SCREEN_CSS }
         section { class: "{class}", id: "boot_screen",
             match *state.read() {
                 State::Boot => {rsx! {
