@@ -10,7 +10,7 @@ pub fn Clock() -> Element {
 
     let mut time = use_signal(|| now.format("%T").to_string());
 
-    spawn(async move {
+    use_future(move || async move {
         loop {
             tokio::time::sleep(Duration::from_millis(1000)).await;
             let now = Local::now();
