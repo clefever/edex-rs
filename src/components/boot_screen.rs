@@ -77,8 +77,8 @@ fn timeout_from_line(line_num: u32, total_lines: usize) -> u64 {
         5..=24 => 30,
         25 => 400,
         42 => 300,
-        42..=81 | 83 => 25,
-        x if x as usize >= total_lines - 2 && (x as usize) < total_lines => 300,
+        43..=81 | 83 => 25,
+        x if x as usize >= total_lines.saturating_sub(2) && (x as usize) < total_lines => 300,
         _ => (f32::powi(1.0 - (line_num as f32 / 1000.0), 3) * 25.0).round() as u64,
     }
 }
@@ -92,5 +92,44 @@ fn is_arch_user() -> bool {
     match fs::read_to_string("/etc/os-release") {
         Ok(str) => str.contains("arch"),
         Err(_) => false,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn special_lines_get_their_pause_times() {
+        let total = 100;
+        assert_eq!(timeout_from_line(1, total), 500); // line 2
+        assert_eq!(timeout_from_line(3, total), 500); // line 4
+        assert_eq!(timeout_from_line(10, total), 30); // lines 5..=24
+        assert_eq!(timeout_from_line(24, total), 400); // line 25
+        assert_eq!(timeout_from_line(41, total), 300); // line 42 pauses, not 25
+        assert_eq!(timeout_from_line(42, total), 25); // line 43
+        assert_eq!(timeout_from_line(82, total), 25); // line 83
+    }
+
+    #[test]
+    fn last_two_lines_pause_before_finishing() {
+        let total = 100;
+        assert_eq!(timeout_from_line(97, total), 300); // line 98 == total - 2
+        assert_eq!(timeout_from_line(98, total), 300); // line 99 == total - 1
+    }
+
+    #[test]
+    fn short_logs_do_not_underflow() {
+        // total < 3 used to evaluate `total_lines - 2` and panic in debug builds
+        assert_eq!(timeout_from_line(0, 2), 300); // line 1 is within the tail window
+        assert_eq!(timeout_from_line(0, 1), 25); // guard excluded, falls to default curve
+        assert_eq!(timeout_from_line(0, 0), 25); // guard never matches
+    }
+
+    #[test]
+    fn default_curve_decays_slowly() {
+        // Line 30 falls through to the powi curve: (1 - 30/1000)^3 * 25
+        let expected = (f32::powi(1.0 - 0.03, 3) * 25.0).round() as u64;
+        assert_eq!(timeout_from_line(29, 1000), expected);
     }
 }

@@ -33,8 +33,7 @@ fn main() {
 fn App() -> Element {
     let init_ui = use_signal(|| true);
     let kb_layout = use_signal(load_kb_layout);
-    let theme = load_theme();
-    let theme = theme_str(theme);
+    let theme = load_theme().to_css_vars();
 
     rsx! {
         document::Style { class: "theming", "{theme}" }
@@ -80,14 +79,12 @@ fn App() -> Element {
 
 fn load_theme() -> models::Theme {
     let theme = include_str!("../assets/themes/tron.json");
-    let result: models::Theme = serde_json::from_str(theme).unwrap();
-    result
+    serde_json::from_str(theme).expect("bundled themes/tron.json failed to parse")
 }
 
 fn load_kb_layout() -> models::KbLayout {
     let layout = include_str!("../assets/kb_layouts/en-US.json");
-    let result: models::KbLayout = serde_json::from_str(layout).unwrap();
-    result
+    serde_json::from_str(layout).expect("bundled kb_layouts/en-US.json failed to parse")
 }
 
 fn fonts_css() -> String {
@@ -117,42 +114,28 @@ fn fonts_css() -> String {
     )
 }
 
-fn theme_str(theme: models::Theme) -> String {
-    format!(
-        "
-    :root {{
-        --font_main: \"{}\";
-        --font_main_light: \"{}\";
-        --font_mono: \"{}\";
-        --color_r: {};
-        --color_g: {};
-        --color_b: {};
-        --color_black: {};
-        --color_light_black: {};
-        --color_grey: {};
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-        /* Used for error and warning modals */
-        --color_red: {};
-        --color_yellow: {};
-    }}
-    body {{
-        font-family: var(--font_main), sans-serif;
-        cursor: none !important;
-    }}
-    * {{
-   	   cursor: none !important;
-	}}
-    ",
-        theme.css_vars.font_main,
-        theme.css_vars.font_main_light,
-        theme.terminal.font_family,
-        theme.colors.r,
-        theme.colors.g,
-        theme.colors.b,
-        theme.colors.black,
-        theme.colors.light_black,
-        theme.colors.grey,
-        theme.colors.red.unwrap_or(String::from("red")),
-        theme.colors.yellow.unwrap_or(String::from("yellow")),
-    )
+    #[test]
+    fn fonts_css_declares_all_four_faces() {
+        let css = fonts_css();
+        for family in [
+            "Fira Code",
+            "Fira Mono",
+            "United Sans Light",
+            "United Sans Medium",
+        ] {
+            assert!(
+                css.contains(&format!("font-family: '{family}';")),
+                "missing @font-face for {family}"
+            );
+        }
+        assert_eq!(
+            css.matches("@font-face").count(),
+            4,
+            "expected exactly four @font-face blocks"
+        );
+    }
 }

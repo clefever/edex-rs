@@ -1,7 +1,5 @@
+use crate::models::{KbLayout, Key};
 use dioxus::prelude::*;
-use models::{KbLayout, Key};
-
-use crate::models;
 
 const KEYBOARD_CSS: Asset = asset!("/assets/css/keyboard.css");
 
