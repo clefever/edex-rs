@@ -16,13 +16,13 @@ enum State {
 pub fn BootScreen() -> Element {
     let mut state = use_signal(|| State::Boot);
     let curr_line: Signal<u32> = use_signal(|| 0);
-    let lines = use_signal(|| vec![]);
-    let class = use_signal(|| String::new());
+    let lines = use_signal(Vec::new);
+    let class = use_signal(String::new);
 
     let all_lines = load_boot_log();
 
     // Time format example: "Fri Jul 15 2022 14:35:43 GMT-0400 (Eastern Daylight Time)"
-    
+
     spawn(async move {
         match state() {
             State::Boot => print_line(curr_line, state, lines, all_lines.clone()).await,

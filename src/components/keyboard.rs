@@ -53,11 +53,11 @@ fn KeyboardKey(
     alt_name: String,
     shift_name: String,
 ) -> Element {
-    if name.starts_with("ESCAPED|-- ICON: ") {
+    if let Some(icon) = name.strip_prefix("ESCAPED|-- ICON: ") {
         rsx! {
             div {
                 class: "keyboard_key",
-                match &name[17..] {
+                match icon {
                     "ARROW_UP" => rsx!(arrow_up {}),
                     "ARROW_LEFT" => rsx!(arrow_left {}),
                     "ARROW_DOWN" => rsx!(arrow_down {}),
@@ -89,7 +89,7 @@ fn KeyboardKey(
                     h2 { "{shift_name}" }
                     h1 { "{name}" }
                 }
-            }
+            },
         }
     }
 }

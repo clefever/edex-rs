@@ -6,6 +6,7 @@ pub struct Theme {
     #[serde(rename = "cssvars")]
     pub css_vars: CssVars,
     pub terminal: Terminal,
+    #[allow(dead_code)] // Read once the globe component lands
     pub globe: Globe,
 }
 
@@ -28,6 +29,9 @@ pub struct CssVars {
 }
 
 #[derive(Deserialize)]
+// Terminal colors are applied once the terminal component lands; the fields
+// must stay so upstream theme JSONs keep deserializing.
+#[allow(dead_code)]
 pub struct Terminal {
     #[serde(rename = "fontFamily")]
     pub font_family: String,
@@ -42,6 +46,8 @@ pub struct Terminal {
 }
 
 #[derive(Deserialize)]
+// Kept whole for upstream theme deserialization; read by the globe component.
+#[allow(dead_code)]
 pub struct Globe {
     pub base: String,
     pub marker: String,

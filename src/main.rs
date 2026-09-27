@@ -1,4 +1,7 @@
-use dioxus::{desktop::{Config, LogicalSize, WindowBuilder, wry::dpi::Size}, prelude::*};
+use dioxus::{
+    desktop::{wry::dpi::Size, Config, LogicalSize, WindowBuilder},
+    prelude::*,
+};
 
 mod components;
 mod models;
@@ -15,24 +18,24 @@ const EXTRA_RATIOS_CSS: Asset = asset!("/assets/css/extra_ratios.css");
 
 fn main() {
     dioxus::LaunchBuilder::new()
-    .with_cfg(
-        Config::default().with_menu(None).with_window(
-            WindowBuilder::new()
-                .with_title("eDEX-rs")
-                .with_resizable(false)
-                .with_inner_size(Size::Logical(LogicalSize::new(1280.0, 720.0)))
-            )
+        .with_cfg(
+            Config::default().with_menu(None).with_window(
+                WindowBuilder::new()
+                    .with_title("eDEX-rs")
+                    .with_resizable(false)
+                    .with_inner_size(Size::Logical(LogicalSize::new(1280.0, 720.0))),
+            ),
         )
-    .launch(App);
+        .launch(App);
 }
 
 #[component]
 fn App() -> Element {
     let init_ui = use_signal(|| true);
-    let kb_layout = use_signal(|| load_kb_layout());
+    let kb_layout = use_signal(load_kb_layout);
     let theme = load_theme();
     let theme = theme_str(theme);
-    
+
     rsx! {
         document::Style { class: "theming", "{theme}" }
         document::Style { class: "fonts", "{fonts_css()}" }
@@ -110,10 +113,7 @@ fn fonts_css() -> String {
         src: url('{}') format('woff2');
     }}
     ",
-        FONT_FIRA_CODE,
-        FONT_FIRA_MONO,
-        FONT_UNITED_SANS_LIGHT,
-        FONT_UNITED_SANS_MEDIUM,
+        FONT_FIRA_CODE, FONT_FIRA_MONO, FONT_UNITED_SANS_LIGHT, FONT_UNITED_SANS_MEDIUM,
     )
 }
 

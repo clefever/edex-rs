@@ -2,15 +2,16 @@
 name = "edex-rs"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "A Rust port of eDEX-UI"
+license = "GPL-3.0-only"
+repository = "https://github.com/clefever/edex-rs"
 
 [dependencies]
 chrono = "0.4"
 dioxus = { version = "0.7.9" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1", features = ["time"] }
 
 [features]
 default = ["desktop"]
