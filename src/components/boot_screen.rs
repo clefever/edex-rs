@@ -85,7 +85,7 @@ fn timeout_from_line(line_num: u32, total_lines: usize) -> u64 {
 
 fn load_boot_log() -> Vec<String> {
     let layout = include_str!("../../assets/misc/boot_log.txt");
-    layout.split('\n').map(str::to_string).collect()
+    layout.lines().map(str::to_string).collect()
 }
 
 fn is_arch_user() -> bool {
@@ -131,5 +131,15 @@ mod tests {
         // Line 30 falls through to the powi curve: (1 - 30/1000)^3 * 25
         let expected = (f32::powi(1.0 - 0.03, 3) * 25.0).round() as u64;
         assert_eq!(timeout_from_line(29, 1000), expected);
+    }
+
+    #[test]
+    fn bundled_boot_log_loads_and_completes() {
+        let lines = load_boot_log();
+        assert!(lines.len() > 50, "boot log unexpectedly short");
+        assert!(
+            lines.iter().any(|l| l == "Boot Complete"),
+            "boot log never reaches Boot Complete"
+        );
     }
 }

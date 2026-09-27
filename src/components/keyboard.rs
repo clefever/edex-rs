@@ -51,16 +51,16 @@ fn KeyboardKey(
     alt_name: String,
     shift_name: String,
 ) -> Element {
-    if let Some(icon) = name.strip_prefix("ESCAPED|-- ICON: ") {
+    if let Some(icon) = icon_from_name(&name) {
         rsx! {
             div {
                 class: "keyboard_key",
                 match icon {
-                    "ARROW_UP" => rsx!(arrow_up {}),
-                    "ARROW_LEFT" => rsx!(arrow_left {}),
-                    "ARROW_DOWN" => rsx!(arrow_down {}),
-                    "ARROW_RIGHT" => rsx!(arrow_right {}),
-                    _ => rsx!(missing_icon {}),
+                    Icon::ArrowUp => rsx!(arrow_up {}),
+                    Icon::ArrowLeft => rsx!(arrow_left {}),
+                    Icon::ArrowDown => rsx!(arrow_down {}),
+                    Icon::ArrowRight => rsx!(arrow_right {}),
+                    Icon::Missing => rsx!(missing_icon {}),
                 }
             }
         }
@@ -90,6 +90,28 @@ fn KeyboardKey(
             },
         }
     }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum Icon {
+    ArrowUp,
+    ArrowLeft,
+    ArrowDown,
+    ArrowRight,
+    Missing,
+}
+
+/// Upstream encodes icon keys as `ESCAPED|-- ICON: <NAME>` in the layout `name`
+/// field. Returns `None` for regular text keys.
+fn icon_from_name(name: &str) -> Option<Icon> {
+    let raw = name.strip_prefix("ESCAPED|-- ICON: ")?;
+    Some(match raw {
+        "ARROW_UP" => Icon::ArrowUp,
+        "ARROW_LEFT" => Icon::ArrowLeft,
+        "ARROW_DOWN" => Icon::ArrowDown,
+        "ARROW_RIGHT" => Icon::ArrowRight,
+        _ => Icon::Missing,
+    })
 }
 
 fn arrow_up() -> Element {
@@ -137,6 +159,81 @@ fn missing_icon() -> Element {
         svg {
             view_box: "0 0 24.00 24.00",
             path { fill: "#ff0000", fill_opacity: "1", d: "M 8.27125,2.9978L 2.9975,8.27125L 2.9975,15.7275L 8.27125,21.0012L 15.7275,21.0012C 17.485,19.2437 21.0013,15.7275 21.0013,15.7275L 21.0013,8.27125L 15.7275,2.9978M 9.10125,5L 14.9025,5L 18.9988,9.10125L 18.9988,14.9025L 14.9025,18.9988L 9.10125,18.9988L 5,14.9025L 5,9.10125M 9.11625,7.705L 7.705,9.11625L 10.5912,12.0025L 7.705,14.8825L 9.11625,16.2937L 12.0025,13.4088L 14.8825,16.2937L 16.2938,14.8825L 13.4087,12.0025L 16.2938,9.11625L 14.8825,7.705L 12.0025,10.5913" }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn arrow_icons_parse() {
+        assert_eq!(
+            icon_from_name("ESCAPED|-- ICON: ARROW_UP"),
+            Some(Icon::ArrowUp)
+        );
+        assert_eq!(
+            icon_from_name("ESCAPED|-- ICON: ARROW_LEFT"),
+            Some(Icon::ArrowLeft)
+        );
+        assert_eq!(
+            icon_from_name("ESCAPED|-- ICON: ARROW_DOWN"),
+            Some(Icon::ArrowDown)
+        );
+        assert_eq!(
+            icon_from_name("ESCAPED|-- ICON: ARROW_RIGHT"),
+            Some(Icon::ArrowRight)
+        );
+    }
+
+    #[test]
+    fn unknown_icon_name_is_missing_icon() {
+        assert_eq!(
+            icon_from_name("ESCAPED|-- ICON: NOT_A_THING"),
+            Some(Icon::Missing)
+        );
+    }
+
+    #[test]
+    fn text_keys_are_not_icons() {
+        assert_eq!(icon_from_name("a"), None);
+        assert_eq!(icon_from_name("Enter"), None);
+        // Missing trailing space after the colon is not the icon prefix
+        assert_eq!(icon_from_name("ESCAPED|-- ICON:ARROW_UP"), None);
+        assert_eq!(icon_from_name(""), None);
+    }
+
+    #[test]
+    fn bundled_layouts_use_recognizable_icon_names() {
+        let layouts_dir =
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("assets/kb_layouts");
+        for entry in std::fs::read_dir(&layouts_dir).unwrap() {
+            let path = entry.unwrap().path();
+            if path.extension().is_none_or(|ext| ext != "json") {
+                continue;
+            }
+            let raw = std::fs::read_to_string(&path).unwrap();
+            let layout = KbLayout::from_json_str(&raw).unwrap();
+            for row in [
+                &layout.row_numbers,
+                &layout.row_1,
+                &layout.row_2,
+                &layout.row_3,
+                &layout.row_space,
+            ] {
+                for key in row {
+                    if let Some(icon) = icon_from_name(&key.name) {
+                        assert_ne!(
+                            icon,
+                            Icon::Missing,
+                            "{}: unrecognized icon {:?}",
+                            path.display(),
+                            key.name
+                        );
+                    }
+                }
+            }
         }
     }
 }

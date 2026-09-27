@@ -84,7 +84,7 @@ fn load_theme() -> models::Theme {
 
 fn load_kb_layout() -> models::KbLayout {
     let layout = include_str!("../assets/kb_layouts/en-US.json");
-    serde_json::from_str(layout).expect("bundled kb_layouts/en-US.json failed to parse")
+    models::KbLayout::from_json_str(layout).expect("bundled kb_layouts/en-US.json failed to parse")
 }
 
 fn fonts_css() -> String {
