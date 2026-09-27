@@ -1,5 +1,5 @@
 use dioxus::{
-    desktop::{wry::dpi::Size, Config, LogicalSize, WindowBuilder},
+    desktop::{Config, LogicalSize, WindowBuilder, wry::dpi::Size},
     prelude::*,
 };
 

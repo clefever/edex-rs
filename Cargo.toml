@@ -1,7 +1,8 @@
 [package]
 name = "edex-rs"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
+rust-version = "1.85"
 description = "A Rust port of eDEX-UI"
 license = "GPL-3.0-only"
 repository = "https://github.com/clefever/edex-rs"

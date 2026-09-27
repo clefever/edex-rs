@@ -91,19 +91,21 @@ pub fn BootScreen(on_done: EventHandler) -> Element {
         on_done.call(());
     });
 
+    let boot_lines = lines.cloned();
+
     rsx! {
         document::Stylesheet { href: BOOT_SCREEN_CSS }
         BootTitleStyle {}
         section { class: "{class}", id: "boot_screen",
             match *state.read() {
-                State::Boot => {rsx! {
-                    {lines.read().iter().map(|line: &String| {
+                State::Boot => rsx! {
+                    {boot_lines.iter().map(|line: &String| {
                         rsx! {
                             "{line}"
                             br {}
                         }
                     })}
-                }},
+                },
                 State::TitleTransition => rsx! { "" },
                 title => rsx! {
                     h1 { class: "{title_class(title)}", "eDEX-rs" }
