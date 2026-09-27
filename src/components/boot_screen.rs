@@ -9,11 +9,41 @@ const BOOT_SCREEN_CSS: Asset = asset!("/assets/css/boot_screen.css");
 enum State {
     Boot,
     TitleTransition,
-    TitleScreen,
+    TitleAppear,
+    TitleFill,
+    TitleBorder,
+    TitleGlitch,
+    TitleSettled,
+}
+
+const BOOT_TITLE_CSS: &str = "
+section#boot_screen h1.title_fill {
+    background-color: rgb(var(--color_r), var(--color_g), var(--color_b));
+    border-bottom: 5px solid rgb(var(--color_r), var(--color_g), var(--color_b));
+}
+section#boot_screen h1.title_border {
+    border: 5px solid rgb(var(--color_r), var(--color_g), var(--color_b));
+}
+";
+
+#[component]
+fn BootTitleStyle() -> Element {
+    rsx! {
+        document::Style { class: "boot_title", {BOOT_TITLE_CSS} }
+    }
+}
+
+fn title_class(state: State) -> &'static str {
+    match state {
+        State::TitleFill => "title_fill",
+        State::TitleBorder | State::TitleSettled => "title_border",
+        State::TitleGlitch => "glitch",
+        _ => "",
+    }
 }
 
 #[component]
-pub fn BootScreen() -> Element {
+pub fn BootScreen(on_done: EventHandler) -> Element {
     let mut state = use_signal(|| State::Boot);
     let mut curr_line: Signal<u32> = use_signal(|| 0);
     let mut lines = use_signal(Vec::new);
@@ -32,7 +62,7 @@ pub fn BootScreen() -> Element {
             if curr_line() == 1 {
                 lines.with_mut(|lines| {
                     lines.push(format!(
-                        "eDEX-UI Kernel version {} boot at {}; root:xnu-1699.22.73~1/RELEASE_X86_64",
+                        "eDEX-rs Kernel version {} boot at {}; root:xnu-1699.22.73~1/RELEASE_X86_64",
                         VERSION.unwrap_or("unknown"),
                         "FIXME"
                     ))
@@ -43,16 +73,27 @@ pub fn BootScreen() -> Element {
             curr_line.with_mut(|line| *line += 1);
         }
 
+        // TODO: upstream also toggles the body solidBackground class here.
         tokio::time::sleep(Duration::from_millis(300)).await;
         state.set(State::TitleTransition);
         tokio::time::sleep(Duration::from_millis(400)).await;
-        state.set(State::TitleScreen);
         class.set("center".to_string());
-        // TODO: Title animation needs theme vars (upstream does more here)
+        state.set(State::TitleAppear);
+        tokio::time::sleep(Duration::from_millis(300)).await;
+        state.set(State::TitleFill);
+        tokio::time::sleep(Duration::from_millis(300)).await;
+        state.set(State::TitleBorder);
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        state.set(State::TitleGlitch);
+        tokio::time::sleep(Duration::from_millis(500)).await;
+        state.set(State::TitleSettled);
+        tokio::time::sleep(Duration::from_millis(1000)).await;
+        on_done.call(());
     });
 
     rsx! {
         document::Stylesheet { href: BOOT_SCREEN_CSS }
+        BootTitleStyle {}
         section { class: "{class}", id: "boot_screen",
             match *state.read() {
                 State::Boot => {rsx! {
@@ -64,7 +105,9 @@ pub fn BootScreen() -> Element {
                     })}
                 }},
                 State::TitleTransition => rsx! { "" },
-                State::TitleScreen => rsx! { h1 { "eDEX-rs" } },
+                title => rsx! {
+                    h1 { class: "{title_class(title)}", "eDEX-rs" }
+                }
             }
         }
     }

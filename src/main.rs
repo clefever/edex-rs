@@ -31,7 +31,8 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    let init_ui = use_signal(|| true);
+    // TODO: settings `nointro`/`nointroOverride` should skip straight to the main UI
+    let mut boot_done = use_signal(|| false);
     let kb_layout = use_signal(load_kb_layout);
     let theme = load_theme().to_css_vars();
 
@@ -42,10 +43,10 @@ fn App() -> Element {
         document::Stylesheet { href: MAIN_SHELL_CSS }
         document::Stylesheet { href: MOD_COLUMN_CSS }
         document::Stylesheet { href: EXTRA_RATIOS_CSS }
-        if !init_ui() {
+        if !boot_done() {
             body {
                 class: "solidBackground",
-                components::BootScreen {}
+                components::BootScreen { on_done: move || boot_done.set(true) }
             }
         } else {
             body { class: "solidBackground",
